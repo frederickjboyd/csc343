@@ -1,0 +1,49 @@
+SELECT flight_id, seat_class, count(*) as occupied, 
+capacity_economy, capacity_business, capacity_first
+FROM booking
+JOIN flight
+ON booking.flight_id = flight.id JOIN plane ON flight.plane = plane.tail_number
+GROUP BY flight_id, seat_class, plane,
+capacity_economy, capacity_business, capacity_first;
+
+SELECT flight.id, seat_class, count(*) as occupied, 
+capacity_economy, capacity_business, capacity_first
+FROM flight
+JOIN plane 
+ON flight.plane = plane.tail_number
+GROUP BY flight_id, seat_class, plane,
+capacity_economy, capacity_business, capacity_first;
+
+SELECT flight_id, seat_class, count(*) as occupied, 
+capacity_economy, capacity_business, capacity_first
+FROM booking
+RIGHT JOIN flight
+ON booking.flight_id = flight.id 
+LEFT JOIN plane ON 
+flight.plane = plane.tail_number
+GROUP BY flight_id, seat_class, plane,
+capacity_economy, capacity_business, capacity_first;
+
+SELECT flight.id, flight.plane, seat_class, count(*), 
+capacity_economy, capacity_business, capacity_first 
+FROM flight
+LEFT JOIN booking
+ON flight.id = booking.flight_id
+JOIN plane
+ON flight.plane = plane.tail_number
+WHERE flight.id = 4 
+AND seat_class = 'economy' 
+GROUP BY flight.id, flight.plane, seat_class, 
+capacity_economy, capacity_business, capacity_first;
+
+SELECT flight.id, flight.plane, seat_class, count(*) as occupied, 
+capacity_economy, capacity_business, capacity_first 
+FROM flight
+LEFT JOIN booking
+ON flight.id = booking.flight_id
+JOIN plane
+ON flight.plane = plane.tail_number
+WHERE flight.id = 10 
+AND seat_class IS NOT NULL 
+GROUP BY flight.id, flight.plane, seat_class, 
+capacity_economy, capacity_business, capacity_first;

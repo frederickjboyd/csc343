@@ -1,0 +1,246 @@
+\documentclass[boldsans]{article}
+\usepackage{ccfonts,fullpage,graphics,rotating,amsmath,amssymb}
+\usepackage{hyperref}
+\hypersetup{pdfpagemode=Fullscreen,
+  colorlinks=true,
+  linkfileprefix={}}
+\title{csc343 winter 2020\\assignment \#1: relational algebra\\
+  {\bf due February 7th, 4 p.m.}}
+\renewcommand{\today}{~}
+\newcommand{\ul}{$\underline{~}$}
+\newboolean{solutions}
+\setboolean{solutions}{false}
+\begin{document}
+\maketitle\vspace{-2\baselineskip}
+\noindent\section*{goals}
+This assignment aims to help you learn to:
+\begin{itemize}
+\item read a relational scheme and analyze instances of the schema
+\item read and apply integrity constraints
+\item express queries and integrity constraints of your own
+\item think about the limits of what can be expressed in relational algebra
+\end{itemize}
+Your assignment must be typed to produce a PDF document
+\textbf{a1.pdf} (hand-written submissions are not acceptable).  You
+may work on the assignment in groups of 1 or 2, and submit a
+single assignment for the entire group on
+\href{https://markus.cdf.toronto.edu/csc343-2020-01}{MarkUs}.  You
+must establish your group well before the due date by submitting an
+incomplete, or even empty, submission.
+\section*{background}
+You will be working on a schema and queries for a database used by a
+zoological institute to track an archive of their artifacts.
+
+During a field trip collectors gather a variety of artifacts of the
+animals they study, resulting in tissue samples, images, physical
+models (such as casts of paw prints), or live colonies.
+
+After arriving at the institute, artifacts must be safely stored and
+maintained by technicians.  Some artifacts are cited in one or more
+publications.  In all cases the official species name must be
+recorded, and must appear in the
+\href{https://www.catalogueoflife.org/}{Catalogue of Life database}.
+If correct taxonomic practices are followed, each species belongs to
+exactly one genus, and each genus to exactly one family. Tables COL,
+Genus, and Species are derived from Catalogue of Life database.
+
+\section*{relations}
+\begin{itemize}
+\item Collection(\underline{CID}, date, SID)\\
+  Tuples here represent entire collections from a field trip, where
+  \textit{CID} is the collection ID, \textit{date} is the starting
+  date of the field trip, and \textit{SID} is the staff ID of the
+  collector.
+
+\item Collected(\underline{CID, AN})\\
+  A tuple here represents the fact that collection \textit{CID}
+  includes artifact number \textit{AN}.  A single collection usually
+  contains multiple artifacts, and a single artifact may be aggregated
+  from more than one collection.
+
+\item Artifact(\underline{AN}, species, type, location, SID)\\
+  Tuples here represent single artifact collected in the field.
+  \textit{AN} is the artifact number, \textit{species} is the scientific species
+  name, \textit{type} is one of tissue, image, model, or live,
+  \textit{location} is where it was collected, and \textit{SID} is the
+  staff number of the technician who maintains this artifact.
+
+\item Published(\underline{AN, journal, date})\\
+  A tuple here represents the fact that artifact \textit{AN} was
+  mentioned in scholarly publication \textit{journal} with publication
+  date \textit{date}.
+
+\item Staff(\underline{SID}, name, email, rank, date)\\
+  These tuples represent a member of the institute's scientific staff.
+  \textit{SID} is the staff ID, \textit{name} is their full name,
+  \textit{email} is their professional email, \textit{rank} is one of:
+  technician, student, pre-tenure, or tenured, and
+  \textit{date} is the date when they attained that rank.
+
+\item COL(\underline{family})\\
+  A singleton tuple here means that \textit{family} is a scientific
+  zoological family name that appears in the Catalogue of  Life.
+
+\item Genus(\underline{genus}, family)\\
+  A tuple here means that \textit{genus} is in family \textit{family}.
+
+\item Species(\underline{species}, genus)\\
+  A tuple here means that \textit{species} is in genus \textit{genus}.
+\end{itemize}
+
+\section*{our constraints}
+
+For each of the following constraints give a one sentence explanation of what the
+constraint implies, and why it is required.
+
+\begin{itemize}
+\item $\pi_{species}(Artifact) - \pi_{species}(Species) = \emptyset$.
+\item $\pi_{rank}(Staff) \subseteq \{\text{'technician', 'student',
+    'pre-tenure', 'tenure'}\}$.
+\item $\pi_{family}(Genus) - \pi_{family}(COL) = \emptyset$.
+\item $\pi_{genus}(Species) \subseteq \pi_{genus}(Genus)$.
+\item $\pi_{CID}(Collected) = \pi_{CID} (Collection)$.
+\item $\pi_{AN}(Artifact) = \pi_{AN}(Collected)$.
+\item $\pi_{SID}(Collection) \subseteq \pi_{SID}(Staff)$.
+\item $\pi_{SID}(Artifact) \subseteq \pi_{SID}(Staff)$.
+\item $\pi_{type}(Artifact) \subseteq \{'tissue', 'image', 'model', 'live'\}$
+\item $\pi_{AN}(Published) \subseteq \pi_{AN}(Artifact)$
+\end{itemize}
+
+\section*{queries}
+
+Write relational algebra expressions for each of the queries below.
+You must use notations from this course and operators:
+\begin{equation*}
+  \pi, \sigma, \rho, \bowtie, \bowtie_{condition}, \times, \cap, \cup,
+  -, =
+\end{equation*}
+You may also use constants:
+\begin{equation*}
+  \text{today (for current date)}\qquad\emptyset\text{ (for the empty set)}
+\end{equation*}
+In your queries pay attention to the following:
+\begin{itemize}
+\item All relations are sets, and you may only use relational algebra
+  operators covered in Chapter~2 of the course text.
+
+\item Do not make assumptions that are not enforced by our constraints
+  above, so your queries should work correctly for any database that
+  obeys our schema and constraints.
+
+\item Other than constants such as 23 or "lupus", a select operation
+  only examines values contained in a tuple, not aggregated over an
+  entire column.
+
+\item Your selection conditions can use arithmetic operators, such as
+  $+, \leq, \neq, \geq, >, <$ and friends.  You can use logical
+  operators such as $\vee, \wedge$, and $\neg$, and treat dates and
+  numeric attributes as numbers that you can perform arithmetic on.
+
+\item Use good variable names and provide lots of comments to explain
+  your intentions.
+
+\item Return multiple tuples if that is appropriate for your query.
+\end{itemize}
+
+There may be a query or queries that cannot be expressed in the
+relational algebra you have been taught so far, in which case just
+write ``cannot be expressed.''  The queries below are not in any
+particular order.
+
+\begin{enumerate}
+\item Rationale: Performance reviews include seeing how current the work
+  is of staff who have held their current rank for a long time.
+
+  \textbf{Query:} Find the most recent collection date of any artifact
+  collected by a staff member who has held their current rank the
+  longest.  Keep ties.
+  
+\item Rationale: Staff who maintain every artifact in some collection
+  should be considered favourably in performance reviews.
+
+  \textbf{Query:} Find all staff who maintain all artifacts in at
+  least one collection.
+
+\item Rationale: An artifact collected and maintained by the same staff
+  may have some special requirements that should be investigated.
+
+  \textbf{Query:} Find all artifacts that were collected by the same
+  staff who maintains them.
+
+\item Rationale: Identify multi-talented field workers.
+
+  \textbf{Query:} Find all staff who have collected at least 3
+  artifacts from every species in some family.
+
+\item Rationale: Which publications might have some specialized niche
+  focus?
+
+  \textbf{Query:} Find all publications that have used exactly 2 of
+  our artifacts.
+
+\item Rationale: Identify motherlode locations.
+
+  \textbf{Query:} Find all locations where at least one artifact from
+  every family has been collected.
+
+\item Rationale: Exclusively tissue sample collectors may need extra
+  support for special reagents and shipping costs.
+
+  \textbf{Query:} Find all staff who have collected only tissue
+  samples.
+
+\item Rationale: Collection staff who should be encouraged to
+  diversify their network.
+
+  \textbf{Query:} Find all staff pairs who have worked only with each
+  other on collections.
+
+\item Rationale: Track the influence of a given staff member.
+
+  \textbf{Query:} Staff member SID$_1$ is influenced by staff member
+  SID$_2$ if (a) they have ever worked together on a collection or (b)
+  if SID$_1$ has ever worked with a staff member who is influenced by
+  SID$_2$.  Find SIDs of staff members influenced by SID 42.
+\end{enumerate}
+
+\section*{your constraints}
+
+For each of these constraints you should derive a relational algebra
+expression of the form $R = \emptyset$, where $R$ may be derived in
+several steps, by assigning intermediate results to a variable.  If
+the constraint cannot be expressed in the relational algebra you have
+been taught, write ``cannot be expressed.''
+
+\begin{enumerate}
+\item No species is also a genus.
+\item No genus belongs to more than one family.
+\item All publications must be published after all artifacts they use
+  have been collected.
+\item Students may not catalogue live artifacts.
+\end{enumerate}
+\section*{submissions}
+
+Submit \textbf{a1.pdf} on \href{https://markus.teach.cs.toronto.edu/csc343-2020-01}{MarkUs}.
+One submission per group, whether a group is one or two people.  You
+declare a group by submitting an empty, or partial, file, and this
+should be done well before the due date.  You may always replace such
+a file with a better version, until the due date.
+
+Double check that you have submitted the correct version of your file
+by downloading it from MarkUs.
+
+\section*{marking}
+
+We mark your submission for correctness, but also for good form:
+\begin{itemize}
+\item For full marks you should add comments to describe the \textit{data}, rather than
+  \textit{technique}, of  your queries.  These may help you get part
+  marks if there is a flaw in your query.
+\item Please use the assignment operator, ``:='' for intermediate results.
+\item Name relations and attributes in a manner that helps the reader
+  remember their intended meaning.
+\item Format the algebraic expressions with line breaks and formatting
+  that help make the meaning clear.
+\end{itemize}
+\end{document}
